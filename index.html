@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>播放中...</title>
+<style>
+    body {
+        margin: 0;
+        background: #000;
+        color: #fff;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        text-align: center;
+        padding: 20px;
+        box-sizing: border-box;
+    }
+    h1 {
+        font-size: 28px;
+        font-weight: 600;
+        margin-bottom: 10px;
+    }
+    p {
+        opacity: 0.6;
+        margin-bottom: 30px;
+    }
+    /* 隐藏原生丑陋的控制条，用自定义按钮 */
+    audio {
+        width: 90%;
+        max-width: 400px;
+        margin-top: 20px;
+    }
+    .play-btn {
+        background-color: #007AFF;
+        color: white;
+        border: none;
+        border-radius: 50px;
+        padding: 18px 50px;
+        font-size: 22px;
+        font-weight: bold;
+        cursor: pointer;
+        margin-top: 20px;
+    }
+</style>
+</head>
+<body>
+
+<h1 id="songTitle">🎵 准备播放...</h1>
+<p>若未自动播放，请点击下方按钮</p>
+
+<!-- 音频播放器 -->
+<audio id="player" controls preload="auto"></audio>
+
+<!-- 备用按钮（iOS 有时需要手动点） -->
+<button class="play-btn" id="manualPlayBtn" style="display:none;">▶ 点击播放</button>
+
+<script>
+    // 1. 读取 NFC 芯片里写的参数（例如 ?n=2 或 ?n=宝贝）
+    const params = new URLSearchParams(window.location.search);
+    let songName = params.get('n') || '我只在乎你'; // 默认播放 我只在乎你
+
+    // 2. 设置音频文件路径（你的文件在仓库根目录）
+    const audioPlayer = document.getElementById('player');
+    // encodeURIComponent 专门处理中文文件名，防止乱码
+    audioPlayer.src = encodeURIComponent(songName) + '.m4a';
+
+    // 3. 更新页面标题
+    document.getElementById('songTitle').innerText = '🎵 ' + songName;
+
+    // 4. 尝试自动播放（iOS 通常会拦截，但不影响后续操作）
+    audioPlayer.play().then(() => {
+        console.log('自动播放成功');
+    }).catch(error => {
+        // 如果自动播放失败，显示手动播放按钮
+        console.log('自动播放被拦截，显示手动按钮');
+        document.getElementById('manualPlayBtn').style.display = 'block';
+    });
+
+    // 5. 手动播放按钮的点击事件
+    document.getElementById('manualPlayBtn').onclick = function() {
+        audioPlayer.play();
+    };
+</script>
+
+</body>
+</html>
+
